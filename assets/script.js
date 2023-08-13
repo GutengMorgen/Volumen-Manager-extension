@@ -1,22 +1,27 @@
 const captureButton = document.getElementById('captureButton');
 const spliter = document.getElementById('rangeVolumen');
+let state = null;
 
-let state = false;
+document.addEventListener('DOMContentLoaded', () => {
+    chrome.runtime.sendMessage({ action: 'getCaptured' });
+    chrome.runtime.onMessage.addListener((message) => {
+        if (message.action === "showNotification") {
+          alert("Se ha recibido una notificación desde el fondo." + message.state);
+          state = message.state;
+        }
+    });
+})
+
+
+
+
 captureButton.addEventListener('click', function() {
-    if(!state){
-        chrome.runtime.sendMessage({ 
-            action: "initCapture",
-            range: +spliter.value
-        });
-        state = true;
-        captureButton.textContent = 'Delete Capture';
-    }
-    else{
+    // console.log(state);
+
+    if(state)
         chrome.runtime.sendMessage({ action: "deleteCapture" });
-        state = false;
-        captureButton.textContent = 'Init Capture';
-    }
-    
+    else
+        chrome.runtime.sendMessage({ action: "initCapture", range: +spliter.value });
 });
 
 spliter.addEventListener('change', function() {
