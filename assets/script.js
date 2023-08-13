@@ -19,7 +19,7 @@ captureButton.addEventListener('click', function() {
     
 });
 
-spliter.addEventListener('click', function() {
+spliter.addEventListener('change', function() {
     // console.log(+this.value + "%");
     chrome.runtime.sendMessage({
         action: "changeVolumen",
