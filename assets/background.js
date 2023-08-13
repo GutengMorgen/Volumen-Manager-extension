@@ -11,7 +11,7 @@ chrome.runtime.onMessage.addListener(function(request) {
         deleteCapture(request.getTabId);
     }
     else if(request.action === 'changeVolumen'){
-        gainNode.gain.value = request.range;
+        changeHandler(request.getTabId, request.range);
     }
 });
 
@@ -64,5 +64,13 @@ function deleteCapture(tabId) {
         audioContext.close();
 
         audioContexts.delete(tabId);
+    }
+}
+
+function changeHandler(tabId, rangeVolumen) {
+    if(audioContexts.has(tabId)){
+        const { audioContext, sourceNode, gainNode } = audioContexts.get(tabId);
+   
+        gainNode.gain.value = rangeVolumen;
     }
 }

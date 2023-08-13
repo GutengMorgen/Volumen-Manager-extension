@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.runtime.sendMessage({ action: 'getCaptured' });
     chrome.runtime.onMessage.addListener((message) => {
         if (message.action === "showNotification") {
-          alert("Se ha recibido una notificación desde el fondo. " + message.state);
           state = message.state;
           tabId = message.tabId;
         }
@@ -15,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 captureButton.addEventListener('click', function() {
-    // console.log(state);
     if(state === null){
         captureButton.textContent = 'Refresh!';
         return;    
@@ -30,7 +28,6 @@ captureButton.addEventListener('click', function() {
 });
 
 spliter.addEventListener('change', function() {
-    // console.log(+this.value + "%");
     chrome.runtime.sendMessage({
         action: "changeVolumen",
         range: +spliter.value
