@@ -18,7 +18,49 @@
 // console.log("action");
 
 
-chrome.browserAction.onClicked.addListener(function(tab) {
+// chrome.browserAction.onClicked.addListener(function(tab) {
+//     chrome.tabCapture.capture({
+//         audio: true,
+//         video: false,
+//         audioConstraints: {
+//             mandatory: {
+//                 chromeMediaSource: 'tab',
+//             },
+//         },
+//     }, function(stream) {
+//         if (stream) {
+//             const audioContext = new AudioContext();
+
+//             const sourceNode = audioContext.createMediaStreamSource(stream);
+//             const gainNode = audioContext.createGain();
+      
+//             gainNode.gain.value = 2.0; // Ajusta este valor para cambiar la amplificación
+
+//             sourceNode.connect(gainNode);
+//             gainNode.connect(audioContext.destination);
+      
+//             // Iniciar la reproducción del audio
+//             sourceNode.mediaStream.getAudioTracks()[0].enabled = true;
+//         }
+//     });
+// });
+const audioContext = new AudioContext();
+const gainNode = audioContext.createGain();
+let sourceNode = null;
+
+chrome.runtime.onMessage.addListener(function(request) {
+    if (request.action === "initCapture") {
+        initCapture(request.range);
+    }
+    else if(request.action === 'deleteCapture'){
+        deleteCapture();
+    }
+    else if(request.action === 'changeVolumen'){
+        gainNode.gain.value = request.range;
+    }
+});
+
+function initCapture(value) {
     chrome.tabCapture.capture({
         audio: true,
         video: false,
@@ -28,19 +70,22 @@ chrome.browserAction.onClicked.addListener(function(tab) {
             },
         },
     }, function(stream) {
-        if (stream) {
-            const audioContext = new AudioContext();
+        sourceNode = audioContext.createMediaStreamSource(stream);
+        gainNode.gain.value = value;
 
-            const sourceNode = audioContext.createMediaStreamSource(stream);
-            const gainNode = audioContext.createGain();
-      
-            gainNode.gain.value = 2.0; // Ajusta este valor para cambiar la amplificación
-
-            sourceNode.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-      
-            // Iniciar la reproducción del audio
-            sourceNode.mediaStream.getAudioTracks()[0].enabled = true;
-        }
+        sourceNode.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+  
+        // Iniciar la reproducción del audio
+        sourceNode.mediaStream.getAudioTracks()[0].enabled = true;
     });
-});
+}
+
+function deleteCapture() {
+    if(sourceNode != null){
+        //detener la reproducción del audio and this tab's content is being shared
+        sourceNode.mediaStream.getAudioTracks()[0].stop();
+        sourceNode.disconnect(gainNode);
+        gainNode.disconnect(audioContext.destination);
+    }
+}
