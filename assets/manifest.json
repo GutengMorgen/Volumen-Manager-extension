@@ -1,0 +1,35 @@
+{
+    "manifest_version" : 2,
+    "name": "Volumen Manager Ex",
+    "description": "Extension para manegar el volumen de los sitios webs",
+    "version" : "1.0",
+    "icons" : {
+        "128": "favicon-16x16.png"
+    },
+    
+    "content_security_policy": "script-src 'self'; object-src 'self'",
+    
+    "permissions": [
+        "tabs",
+        "activeTab",
+        "storage",
+        "tabCapture"
+    ],
+
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+
+    "content_scripts": [
+        {
+          "matches": ["<all_urls>"],
+          "js": ["content.js"],
+          "run_at": "document_end"
+        }
+    ],
+
+    "browser_action": {
+        "default_title": "Volumen Manager Ex"
+    }
+}
